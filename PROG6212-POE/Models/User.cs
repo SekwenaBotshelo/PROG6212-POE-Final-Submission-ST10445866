@@ -5,7 +5,6 @@ namespace PROG6212_POE.Models
 {
     public class User
     {
-        [Key]
         public int UserId { get; set; }
 
         [Required(ErrorMessage = "Name is required")]
@@ -36,11 +35,6 @@ namespace PROG6212_POE.Models
         [DataType(DataType.Password)]
         [MinLength(6, ErrorMessage = "Password must be at least 6 characters")]
         public string Password { get; set; } = string.Empty;
-
-        // Navigation properties
-        public virtual ICollection<Claim> ClaimsSubmitted { get; set; } = new List<Claim>();
-        public virtual ICollection<Claim> ClaimsVerified { get; set; } = new List<Claim>();
-        public virtual ICollection<Claim> ClaimsApproved { get; set; } = new List<Claim>();
 
         // Helper properties
         [NotMapped]

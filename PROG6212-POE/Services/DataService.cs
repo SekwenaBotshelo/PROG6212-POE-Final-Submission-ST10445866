@@ -89,6 +89,13 @@ namespace PROG6212_POE.Services
 
         public static User GetUserById(int id) => _users.FirstOrDefault(u => u.UserId == id);
 
+        // ADD THIS METHOD to get lecturer name by ID
+        public static string GetLecturerName(int lecturerId)
+        {
+            var lecturer = _users.FirstOrDefault(u => u.UserId == lecturerId);
+            return lecturer?.FullName ?? $"Lecturer {lecturerId}";
+        }
+
         // Claim methods  
         public static List<Claim> GetClaims() => _claims;
 
@@ -111,7 +118,7 @@ namespace PROG6212_POE.Services
         public static List<Claim> GetClaimsByLecturer(int lecturerId) =>
             _claims.Where(c => c.LecturerId == lecturerId).ToList();
 
-        // ADD THIS METHOD for clearing data
+        // Clear all data
         public static void ClearAllData()
         {
             _users.Clear();

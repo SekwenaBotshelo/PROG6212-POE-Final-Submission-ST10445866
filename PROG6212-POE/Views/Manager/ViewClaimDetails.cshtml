@@ -1,4 +1,5 @@
 ﻿@model PROG6212_POE.Models.Claim
+@using PROG6212_POE.Services
 @{
     ViewData["Title"] = "Manager Claim Details";
 }
@@ -15,7 +16,7 @@
                     <p><strong>Lecturer:</strong> @Model.SafeLecturerName</p>
                     <p><strong>Email:</strong> @Model.SafeLecturerEmail</p>
                     <p><strong>Hourly Rate:</strong> R @Model.StoredHourlyRate.ToString("F2")</p>
-                    <p><strong>Verified By:</strong> @(Model.VerifiedByCoordinator?.FullName ?? "Not Verified")</p>
+                    <p><strong>Verified By:</strong> @GetUserName(Model.VerifiedByCoordinatorId)</p> <!-- FIXED: Use helper method -->
                     <p><strong>Verified Date:</strong> @Model.VerifiedDate?.ToString("yyyy-MM-dd")</p>
                 </div>
                 <div class="col-md-6">
@@ -112,4 +113,16 @@
             });
         }
     </script>
+}
+
+@functions {
+    public string GetUserName(int? userId)
+    {
+        if (userId.HasValue)
+        {
+            var user = DataService.GetUserById(userId.Value);
+            return user?.FullName ?? $"User {userId}";
+        }
+        return "Not assigned";
+    }
 }

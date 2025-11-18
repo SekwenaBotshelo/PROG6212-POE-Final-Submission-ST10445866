@@ -1,19 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PROG6212_POE.Services;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PROG6212_POE.Models
 {
     public class Claim
     {
-        [Key]
         public int ClaimId { get; set; }
 
         // Foreign key to User (Lecturer who submitted the claim)
         [Required]
         public int LecturerId { get; set; }
-
-        [ForeignKey("LecturerId")]
-        public virtual User? Lecturer { get; set; } // Make nullable
 
         [Required(ErrorMessage = "Please enter total hours worked.")]
         [Range(1, 180, ErrorMessage = "Hours must be between 1 and 180.")]
@@ -41,33 +38,12 @@ namespace PROG6212_POE.Models
         // Status workflow: Pending Verification → Verified → Approved → Paid
         public string Status { get; set; } = "Pending Verification";
 
-        // Computed property that uses stored amount or calculates if needed
-        [NotMapped]
-        [Display(Name = "Total Amount")]
-        [DataType(DataType.Currency)]
-        public double TotalAmount
-        {
-            get
-            {
-                if (StoredTotalAmount > 0)
-                    return (double)StoredTotalAmount;
-                else
-                    return TotalHours * (double)(Lecturer?.HourlyRate ?? StoredHourlyRate);
-            }
-        }
-
         // Approval tracking
         [Display(Name = "Verified By")]
         public int? VerifiedByCoordinatorId { get; set; }
 
-        [ForeignKey("VerifiedByCoordinatorId")]
-        public virtual User? VerifiedByCoordinator { get; set; }
-
         [Display(Name = "Approved By")]
         public int? ApprovedByManagerId { get; set; }
-
-        [ForeignKey("ApprovedByManagerId")]
-        public virtual User? ApprovedByManager { get; set; }
 
         // Timestamps
         [Display(Name = "Submitted Date")]
@@ -89,19 +65,29 @@ namespace PROG6212_POE.Models
         [Display(Name = "Document Original Name")]
         public string? DocumentOriginalName { get; set; }
 
-        // COMPUTED PROPERTIES WITH NULL CHECKING
+        // COMPUTED PROPERTIES
         [NotMapped]
-        public string LecturerName => Lecturer?.FullName ?? "Unknown Lecturer";
+        [Display(Name = "Total Amount")]
+        [DataType(DataType.Currency)]
+        public double TotalAmount => (double)StoredTotalAmount;
+
+        [NotMapped]
+        public string LecturerName => DataService.GetLecturerName(LecturerId);
 
         [NotMapped]
         public decimal HourlyRate => StoredHourlyRate;
 
-        // NEW: Safe property for Lecturer FullName
         [NotMapped]
-        public string SafeLecturerName => Lecturer?.FullName ?? "Lecturer Not Found";
+        public string SafeLecturerName => DataService.GetLecturerName(LecturerId);
 
-        // NEW: Safe property for Lecturer Email
         [NotMapped]
-        public string SafeLecturerEmail => Lecturer?.Email ?? "Email Not Available";
+        public string SafeLecturerEmail
+        {
+            get
+            {
+                var lecturer = DataService.GetUserById(LecturerId);
+                return lecturer?.Email ?? "Email Not Available";
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<PROG6212_POE.Models.Claim>
+@using PROG6212_POE.Services
 @{
     ViewData["Title"] = "Approve Claims";
 }
@@ -37,13 +38,13 @@
                             {
                                 <tr>
                                     <td>@claim.ClaimId</td>
-                                    <td>@claim.SafeLecturerName</td> <!-- FIXED -->
+                                    <td>@claim.SafeLecturerName</td>
                                     <td>@claim.Month</td>
                                     <td>@claim.TotalHours</td>
                                     <td>R @claim.StoredHourlyRate.ToString("F2")</td>
                                     <td>R @claim.TotalAmount.ToString("F2")</td>
                                     <td><span class="badge bg-info">@claim.Status</span></td>
-                                    <td>@(claim.VerifiedByCoordinator?.FullName ?? "Not Verified")</td>
+                                    <td>@GetUserName(claim.VerifiedByCoordinatorId)</td> <!-- FIXED: Use helper method -->
                                     <td>
                                         <a href="/Manager/ViewClaimDetails/@claim.ClaimId" class="btn btn-info btn-sm">View Details</a>
                                     </td>
@@ -66,3 +67,15 @@
         <a asp-action="Dashboard" class="btn btn-secondary">Back to Dashboard</a>
     </div>
 </div>
+
+@functions {
+    public string GetUserName(int? userId)
+    {
+        if (userId.HasValue)
+        {
+            var user = DataService.GetUserById(userId.Value);
+            return user?.FullName ?? $"User {userId}";
+        }
+        return "Not Verified";
+    }
+}

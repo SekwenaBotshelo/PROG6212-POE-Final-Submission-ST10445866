@@ -1,3 +1,5 @@
+using PROG6212_POE.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -31,6 +33,9 @@ app.UseSession();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+// Seed demo data on application startup
+DemoSeeder.Seed();
 
 app.MapControllerRoute(
     name: "default",

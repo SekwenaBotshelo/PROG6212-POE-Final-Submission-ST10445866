@@ -1,4 +1,5 @@
 ﻿@model List<PROG6212_POE.Models.Claim>
+@using PROG6212_POE.Services
 @{
     ViewData["Title"] = "View All Claims";
 }
@@ -33,7 +34,7 @@
                             {
                                 <tr>
                                     <td>@claim.ClaimId</td>
-                                    <td>@claim.Lecturer.FullName</td>
+                                    <td>@claim.SafeLecturerName</td> <!-- FIXED: Use SafeLecturerName -->
                                     <td>@claim.Month</td>
                                     <td>@claim.TotalHours</td>
                                     <td>R @claim.TotalAmount.ToString("F2")</td>
