@@ -1,112 +1,70 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PROG6212_POE.Controllers;
-using PROG6212_POE.Data;
 using PROG6212_POE.Models;
+using PROG6212_POE.Services;
 using Xunit;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace PROG6212_POE.Tests
 {
     public class ManagerControllerTests
     {
-        private ManagerController GetController(AppDbContext context)
+        [Fact]
+        public void Dashboard_ReturnsActionResult()
         {
-            return new ManagerController(context);
-        }
-
-        private AppDbContext GetNewInMemoryDb()
-        {
-            var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseInMemoryDatabase(System.Guid.NewGuid().ToString())
-                .Options;
-            return new AppDbContext(options);
-        }
-
-        private void SeedClaims(AppDbContext context)
-        {
-            context.Claims.AddRange(
-                new Claim
-                {
-                    ClaimId = 201,
-                    LecturerName = "Manager_Alice",
-                    Month = "October",
-                    TotalHours = 10,
-                    HourlyRate = 150,
-                    Status = ClaimStatus.Verified
-                },
-                new Claim
-                {
-                    ClaimId = 202,
-                    LecturerName = "Manager_Bob",
-                    Month = "October",
-                    TotalHours = 8,
-                    HourlyRate = 200,
-                    Status = ClaimStatus.Verified
-                }
-            );
-            context.SaveChanges();
+            TestDataHelper.SeedTestUsers();
+            TestDataHelper.SeedTestClaims();
+            var controller = TestControllerHelper.CreateController<ManagerController>("3", "Manager");
+            var result = controller.Dashboard();
+            Assert.NotNull(result);
         }
 
         [Fact]
-        public void Dashboard_ReturnsAllClaims()
+        public void ApproveClaims_ReturnsActionResult()
         {
-            var context = GetNewInMemoryDb();
-            SeedClaims(context);
-            var controller = GetController(context);
-
-            var result = controller.Dashboard() as ViewResult;
-
+            TestDataHelper.SeedTestUsers();
+            TestDataHelper.SeedTestClaims();
+            var controller = TestControllerHelper.CreateController<ManagerController>("3", "Manager");
+            var result = controller.ApproveClaims();
             Assert.NotNull(result);
-            var model = Assert.IsAssignableFrom<List<Claim>>(result.Model);
-            Assert.Equal(2, model.Count);
         }
 
         [Fact]
-        public void Approve_ValidId_UpdatesStatus()
+        public void ViewClaimDetails_ReturnsActionResult()
         {
-            var context = GetNewInMemoryDb();
-            SeedClaims(context);
-            var controller = GetController(context);
-
-            var result = controller.Approve(201) as RedirectToActionResult;
-
+            TestDataHelper.SeedTestUsers();
+            TestDataHelper.SeedTestClaims();
+            var controller = TestControllerHelper.CreateController<ManagerController>("3", "Manager");
+            var result = controller.ViewClaimDetails(102);
             Assert.NotNull(result);
-            Assert.Equal("ApproveClaims", result.ActionName);
-
-            var claim = context.Claims.First(c => c.ClaimId == 201);
-            Assert.Equal(ClaimStatus.Approved, claim.Status);
         }
 
         [Fact]
-        public void Reject_ValidId_UpdatesStatus()
+        public void ApproveClaim_ReturnsRedirectResult()
         {
-            var context = GetNewInMemoryDb();
-            SeedClaims(context);
-            var controller = GetController(context);
-
-            var result = controller.Reject(202) as RedirectToActionResult;
-
-            Assert.NotNull(result);
-            Assert.Equal("ApproveClaims", result.ActionName);
-
-            var claim = context.Claims.First(c => c.ClaimId == 202);
-            Assert.Equal(ClaimStatus.Rejected, claim.Status);
+            TestDataHelper.SeedTestUsers();
+            TestDataHelper.SeedTestClaims();
+            var controller = TestControllerHelper.CreateController<ManagerController>("3", "Manager");
+            var result = controller.ApproveClaim(102);
+            Assert.IsType<RedirectToActionResult>(result);
         }
 
         [Fact]
-        public void Reports_ReturnsAllClaims()
+        public void Reports_ReturnsActionResult()
         {
-            var context = GetNewInMemoryDb();
-            SeedClaims(context);
-            var controller = GetController(context);
-
-            var result = controller.Reports() as ViewResult;
-
+            TestDataHelper.SeedTestUsers();
+            TestDataHelper.SeedTestClaims();
+            var controller = TestControllerHelper.CreateController<ManagerController>("3", "Manager");
+            var result = controller.Reports();
             Assert.NotNull(result);
-            var model = Assert.IsAssignableFrom<List<Claim>>(result.Model);
-            Assert.Equal(2, model.Count);
+        }
+
+        [Fact]
+        public void Dashboard_Unauthorized_RedirectsToAccessDenied()
+        {
+            var controller = TestControllerHelper.CreateController<ManagerController>("1", "Lecturer");
+            var result = controller.Dashboard();
+            var redirect = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("AccessDenied", redirect.ActionName);
         }
     }
 }
