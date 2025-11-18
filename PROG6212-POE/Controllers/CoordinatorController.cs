@@ -1,123 +1,145 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PROG6212_POE.Data;
 using PROG6212_POE.Models;
-using System;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using PROG6212_POE.Services;
+using System.Diagnostics;
 
 namespace PROG6212_POE.Controllers
 {
     public class CoordinatorController : Controller
     {
-        private readonly AppDbContext _context;
-
-        public CoordinatorController(AppDbContext context)
+        // Helper method to get current coordinator
+        private User GetCurrentCoordinator()
         {
-            _context = context;
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId)) return null;
+
+            var users = DataService.GetUsers();
+            return users.FirstOrDefault(u => u.UserId.ToString() == userId && u.Role == "Coordinator");
         }
 
-        // Dashboard with summary cards
+        // GET: /Coordinator/Dashboard
         public IActionResult Dashboard()
         {
-            var claims = _context.Claims
-                                 .Include(c => c.SupportingDocuments)
-                                 .ToList();
+            if (HttpContext.Session.GetString("UserRole") != "Coordinator")
+                return RedirectToAction("AccessDenied", "Account");
 
-            ViewBag.PendingCount = claims.Count(c => c.Status == ClaimStatus.Pending);
-            ViewBag.VerifiedCount = claims.Count(c => c.Status == ClaimStatus.Verified);
-            ViewBag.TotalCount = claims.Count;
+            var coordinator = GetCurrentCoordinator();
+            if (coordinator == null)
+                return RedirectToAction("Logout", "Account");
 
-            return View(claims);
-        }
+            ViewBag.CurrentUser = coordinator;
 
-        // Show pending claims for verification
-        public IActionResult VerifyClaims()
-        {
-            var pendingClaims = _context.Claims
-                                        .Where(c => c.Status == ClaimStatus.Pending)
-                                        .ToList();
+            // Get claims pending verification using DataService
+            var claims = DataService.GetClaims();
+            var pendingClaims = claims.Where(c => c.Status == "Pending Verification").ToList();
+            var verifiedClaims = claims.Where(c => c.Status == "Verified" && c.VerifiedByCoordinatorId == coordinator.UserId).ToList();
+
+            ViewBag.PendingCount = pendingClaims.Count;
+            ViewBag.VerifiedCount = verifiedClaims.Count;
+            ViewBag.TotalClaims = claims.Count;
+
             return View(pendingClaims);
         }
 
-        // Show claim details for verification
+        // GET: /Coordinator/VerifyClaims
+        public IActionResult VerifyClaims()
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Coordinator")
+                return RedirectToAction("AccessDenied", "Account");
+
+            var coordinator = GetCurrentCoordinator();
+            if (coordinator == null)
+                return RedirectToAction("Logout", "Account");
+
+            var claims = DataService.GetClaims();
+            var pendingClaims = claims.Where(c => c.Status == "Pending Verification").ToList();
+
+            ViewBag.CurrentUser = coordinator;
+            return View(pendingClaims);
+        }
+
+        // GET: /Coordinator/ViewClaimDetails/{id}
         public IActionResult ViewClaimDetails(int id)
         {
-            var claim = _context.Claims
-                                .Include(c => c.SupportingDocuments)
-                                .FirstOrDefault(c => c.ClaimId == id);
-            if (claim == null) return NotFound();
+            if (HttpContext.Session.GetString("UserRole") != "Coordinator")
+                return RedirectToAction("AccessDenied", "Account");
 
-            return View("VerifyClaimDetails", claim);
-        }
+            var claims = DataService.GetClaims();
+            var claim = claims.FirstOrDefault(c => c.ClaimId == id);
 
-        // POST: Verify a claim (automated)
-        [HttpPost]
-        public IActionResult Verify(int id)
-        {
-            var claim = _context.Claims.FirstOrDefault(c => c.ClaimId == id);
-            if (claim != null)
+            if (claim == null)
             {
-                // Automated verification rules
-                if (claim.TotalHours <= 200 && claim.HourlyRate <= 1000)
-                    claim.Status = ClaimStatus.Verified;
-                else
-                    claim.Status = ClaimStatus.Rejected;
-
-                _context.SaveChanges();
-
-                // Audit Trail logging
-                _context.AuditTrails.Add(new AuditTrail
-                {
-                    Action = $"Claim {(claim.Status == ClaimStatus.Verified ? "verified" : "rejected")} for {claim.LecturerName} (Claim ID: {claim.ClaimId})",
-                    Timestamp = DateTime.Now,
-                    UserName = "Coordinator" // Replace with logged-in coordinator username when auth is implemented
-                });
-                _context.SaveChanges();
+                TempData["ErrorMessage"] = "Claim not found.";
+                return RedirectToAction("Dashboard");
             }
 
-            return RedirectToAction("VerifyClaims");
+            ViewBag.ClaimId = id;
+            ViewBag.CurrentUser = GetCurrentCoordinator();
+            return View(claim);
         }
 
-        // POST: Reject a claim manually
+        // POST: /Coordinator/VerifyClaim
         [HttpPost]
-        public IActionResult Reject(int id)
+        [ValidateAntiForgeryToken]
+        public IActionResult VerifyClaim(int claimId)
         {
-            var claim = _context.Claims.FirstOrDefault(c => c.ClaimId == id);
+            if (HttpContext.Session.GetString("UserRole") != "Coordinator")
+                return RedirectToAction("AccessDenied", "Account");
+
+            var coordinator = GetCurrentCoordinator();
+            if (coordinator == null)
+                return RedirectToAction("Logout", "Account");
+
+            var claims = DataService.GetClaims();
+            var claim = claims.FirstOrDefault(c => c.ClaimId == claimId);
+
             if (claim != null)
             {
-                claim.Status = ClaimStatus.Rejected;
-                _context.SaveChanges();
+                claim.Status = "Verified";
+                claim.VerifiedByCoordinatorId = coordinator.UserId;
+                claim.VerifiedDate = DateTime.Now;
 
-                // Audit Trail logging
-                _context.AuditTrails.Add(new AuditTrail
-                {
-                    Action = $"Claim rejected manually for {claim.LecturerName} (Claim ID: {claim.ClaimId})",
-                    Timestamp = DateTime.Now,
-                    UserName = "Coordinator" // Replace with logged-in coordinator username when auth is implemented
-                });
-                _context.SaveChanges();
+                DataService.UpdateClaim(claim);
+                TempData["SuccessMessage"] = "Claim verified successfully!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Claim not found.";
             }
 
-            return RedirectToAction("VerifyClaims");
+            return RedirectToAction("Dashboard");
         }
 
-        // Reports page
-        public IActionResult Reports()
+        // POST: /Coordinator/RejectClaim
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult RejectClaim(int claimId)
         {
-            var allClaims = _context.Claims
-                                    .Include(c => c.SupportingDocuments)
-                                    .ToList();
+            if (HttpContext.Session.GetString("UserRole") != "Coordinator")
+                return RedirectToAction("AccessDenied", "Account");
 
-            // Optional: log that a report was generated
-            _context.AuditTrails.Add(new AuditTrail
+            var coordinator = GetCurrentCoordinator();
+            if (coordinator == null)
+                return RedirectToAction("Logout", "Account");
+
+            var claims = DataService.GetClaims();
+            var claim = claims.FirstOrDefault(c => c.ClaimId == claimId);
+
+            if (claim != null)
             {
-                Action = $"Coordinator generated claims report",
-                Timestamp = DateTime.Now,
-                UserName = "Coordinator"
-            });
-            _context.SaveChanges();
+                claim.Status = "Rejected";
+                claim.VerifiedByCoordinatorId = coordinator.UserId;
+                claim.VerifiedDate = DateTime.Now;
 
-            return View(allClaims);
+                DataService.UpdateClaim(claim);
+                TempData["SuccessMessage"] = "Claim rejected successfully!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Claim not found.";
+            }
+
+            return RedirectToAction("Dashboard");
         }
     }
 }
