@@ -1,0 +1,63 @@
+﻿@model PROG6212_POE.Models.Claim
+@{
+    ViewData["Title"] = "Upload Supporting Document";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4 text-center">Upload Supporting Document for Claim ID: @Model.ClaimId</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger text-center">@TempData["ErrorMessage"]</div>
+    }
+
+    <form asp-action="UploadDocuments" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="claimId" value="@Model.ClaimId" />
+
+        <div class="form-group mb-3">
+            <label for="supportingFile">Select File</label>
+            <input type="file" name="supportingFile" id="supportingFile" class="form-control"
+                   accept=".pdf,.docx,.xlsx" aria-describedby="fileHelp" />
+            <small id="fileHelp" class="form-text text-muted">
+                Allowed formats: .pdf, .docx, .xlsx
+            </small>
+        </div>
+
+        <button type="submit" class="btn btn-primary mb-2">Upload</button>
+        <a asp-action="Dashboard" class="btn btn-secondary mb-2 ms-2">Back to Dashboard</a>
+    </form>
+
+    @if (Model.SupportingDocuments != null && Model.SupportingDocuments.Any())
+    {
+        <h4 class="mt-4">Uploaded Files</h4>
+        <ul>
+            @foreach (var doc in Model.SupportingDocuments.OrderByDescending(d => d.DocumentId))
+            {
+                <li class="text-truncate" style="max-width: 300px;">
+                    <a href="@doc.FilePath" target="_blank" title="@doc.FileName">@doc.FileName</a>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p class="text-muted mt-2">No files uploaded yet.</p>
+    }
+
+    <!-- Optional Guidance Card -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Tips for Uploading Documents</h5>
+            <ul class="text-muted">
+                <li>Ensure the file is one of the allowed formats: .pdf, .docx, .xlsx.</li>
+                <li>File names should be concise and descriptive.</li>
+                <li>Upload all necessary supporting documents to avoid delays.</li>
+                <li>If multiple files are needed, upload them one by one.</li>
+            </ul>
+        </div>
+    </div>
+</div>
