@@ -58,11 +58,11 @@
 
                         <tr class="@(claim.Status == "Pending Verification" ? "table-warning" : claim.Status == "Rejected" ? "table-danger" : "")">
                             <td>@claim.ClaimId</td>
-                            <td>@claim.LecturerName</td>
+                            <td>@claim.SafeLecturerName</td> <!-- Fixed: Use SafeLecturerName -->
                             <td>@claim.Month</td>
                             <td>@claim.TotalHours</td>
-                            <td>R @claim.HourlyRate</td>
-                            <td>R @claim.TotalAmount</td>
+                            <td>R @claim.StoredHourlyRate</td> <!-- Fixed: Use StoredHourlyRate -->
+                            <td>R @claim.StoredTotalAmount</td> <!-- Fixed: Use StoredTotalAmount -->
                             <td>
                                 <span class="badge @badgeClass" title="@claim.Status">@claim.Status</span>
                             </td>
@@ -77,16 +77,14 @@
                                 </div>
                             </td>
                             <td>
-                                @if (claim.SupportingDocuments != null && claim.SupportingDocuments.Any())
+                                <!-- FIXED: Use DocumentPath instead of SupportingDocuments -->
+                                @if (!string.IsNullOrEmpty(claim.DocumentPath))
                                 {
-                                    <ul class="mb-0">
-                                        @foreach (var doc in claim.SupportingDocuments.OrderByDescending(d => d.DocumentId))
-                                        {
-                                            <li class="text-truncate" style="max-width: 200px;">
-                                                <a href="@doc.FilePath" target="_blank" title="@doc.FileName">@doc.FileName</a>
-                                            </li>
-                                        }
-                                    </ul>
+                                    <div class="text-truncate" style="max-width: 200px;">
+                                        <a href="/uploads/@claim.DocumentPath" target="_blank" title="@claim.DocumentOriginalName">
+                                            @claim.DocumentOriginalName
+                                        </a>
+                                    </div>
                                 }
                                 else
                                 {
@@ -101,9 +99,10 @@
                                         Upload
                                     </button>
                                 </form>
-                                @if (claim.SupportingDocuments != null && claim.SupportingDocuments.Any())
+                                <!-- FIXED: Document count display -->
+                                @if (!string.IsNullOrEmpty(claim.DocumentPath))
                                 {
-                                    <small class="text-muted">Uploaded: @claim.SupportingDocuments.Count()</small>
+                                    <small class="text-muted">Document attached</small>
                                 }
                             </td>
                         </tr>

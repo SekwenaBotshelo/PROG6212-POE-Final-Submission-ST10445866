@@ -1,104 +1,76 @@
-﻿using PROG6212_POE.Data;
-using PROG6212_POE.Models;
-using System.Linq;
+﻿using PROG6212_POE.Models;
+using PROG6212_POE.Services;
 
-public static class DemoDataSeeder
+namespace PROG6212_POE.Data
 {
-    public static void Seed(AppDbContext context)
+    public static class DemoSeeder
     {
-        if (!context.Claims.Any())
+        public static void Seed()
         {
-            var claim1 = new Claim
+            // Clear existing data and re-initialize with test users
+            DataService.ClearAllData();
+
+            // Add demo claims for testing
+            var claims = new List<Claim>
             {
-                LecturerName = "John Smith",
-                Month = "October",
-                TotalHours = 20,
-                HourlyRate = 200,
-                Status = ClaimStatus.Pending
+                new Claim
+                {
+                    ClaimId = 1,
+                    LecturerId = 2, // John Smith
+                    Month = "January 2025",
+                    TotalHours = 120,
+                    StoredHourlyRate = 350,
+                    StoredTotalAmount = 120 * 350,
+                    Status = "Pending Verification",
+                    SubmittedDate = DateTime.Now.AddDays(-10),
+                    Notes = "Regular teaching hours for January"
+                },
+                new Claim
+                {
+                    ClaimId = 2,
+                    LecturerId = 2, // John Smith
+                    Month = "February 2025",
+                    TotalHours = 150,
+                    StoredHourlyRate = 350,
+                    StoredTotalAmount = 150 * 350,
+                    Status = "Verified",
+                    SubmittedDate = DateTime.Now.AddDays(-5),
+                    VerifiedDate = DateTime.Now.AddDays(-2),
+                    VerifiedByCoordinatorId = 4 // Michael Brown (Coordinator)
+                },
+                new Claim
+                {
+                    ClaimId = 3,
+                    LecturerId = 3, // Emily Johnson
+                    Month = "January 2025",
+                    TotalHours = 140,
+                    StoredHourlyRate = 380,
+                    StoredTotalAmount = 140 * 380,
+                    Status = "Approved",
+                    SubmittedDate = DateTime.Now.AddDays(-8),
+                    VerifiedDate = DateTime.Now.AddDays(-4),
+                    ApprovedDate = DateTime.Now.AddDays(-1),
+                    VerifiedByCoordinatorId = 4, // Michael Brown (Coordinator)
+                    ApprovedByManagerId = 5 // David Miller (Manager)
+                },
+                new Claim
+                {
+                    ClaimId = 4,
+                    LecturerId = 3, // Emily Johnson
+                    Month = "February 2025",
+                    TotalHours = 160,
+                    StoredHourlyRate = 380,
+                    StoredTotalAmount = 160 * 380,
+                    Status = "Pending Verification",
+                    SubmittedDate = DateTime.Now.AddDays(-3),
+                    Notes = "Including overtime for special projects"
+                }
             };
 
-            var claim2 = new Claim
+            foreach (var claim in claims)
             {
-                LecturerName = "Jane Doe",
-                Month = "October",
-                TotalHours = 15,
-                HourlyRate = 250,
-                Status = ClaimStatus.Verified
-            };
-
-            context.Claims.AddRange(claim1, claim2);
-            context.SaveChanges();
-
-            claim1.SupportingDocuments.Add(new Document
-            {
-                FileName = "Timesheet_John.pdf",
-                FilePath = "/uploads/Timesheet_John.pdf",
-                ClaimId = claim1.ClaimId
-            });
-
-            claim2.SupportingDocuments.Add(new Document
-            {
-                FileName = "Invoice_Jane.xlsx",
-                FilePath = "/uploads/Invoice_Jane.xlsx",
-                ClaimId = claim2.ClaimId
-            });
-
-            context.SaveChanges();
-        }
-
-        // Seed Coordinators
-        if (!context.Coordinators.Any())
-        {
-            context.Coordinators.Add(new Coordinator
-            {
-                Name = "Mark Daniels",
-                Email = "mark.daniels@campus.edu"
-            });
-            context.SaveChanges();
-        }
-
-        // Seed Managers
-        if (!context.Managers.Any())
-        {
-            context.Managers.Add(new Manager
-            {
-                Name = "Linda Khoza",
-                Email = "linda.khoza@campus.edu"
-            });
-            context.SaveChanges();
-        }
-
-        // Seed HR
-        if (!context.HRs.Any())
-        {
-            context.HRs.Add(new HR
-            {
-                Name = "Zanele Mthembu",
-                Email = "zanele.hr@campus.edu"
-            });
-            context.SaveChanges();
-        }
-
-        // Seed a few Invoices for HR automation demo
-        if (!context.Invoices.Any())
-        {
-            context.Invoices.Add(new Invoice
-            {
-                ClaimId = 1,
-                LecturerName = "John Smith",
-                AmountPaid = 4000,
-                PaymentStatus = "Paid"
-            });
-
-            context.Invoices.Add(new Invoice
-            {
-                ClaimId = 2,
-                LecturerName = "Jane Doe",
-                AmountPaid = 3750,
-                PaymentStatus = "Processing"
-            });
-
-            context.SaveChanges();
+                DataService.AddClaim(claim);
+            }
         }
     }
 }

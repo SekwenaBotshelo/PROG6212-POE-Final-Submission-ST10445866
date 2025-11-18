@@ -36,31 +36,31 @@
                     {
                         <tr>
                             <td>@claim.ClaimId</td>
-                            <td>@claim.LecturerName</td>
+                            <td>@claim.SafeLecturerName</td>
                             <td>@claim.Month</td>
                             <td>@claim.TotalHours</td>
-                            <td>R @claim.TotalAmount</td>
+                            <td>R @claim.StoredTotalAmount</td>
                             <td>
-                                <span class="badge @(claim.Status switch
-                                      {
-                                          "Pending" => "bg-warning",
-                                          "Verified" => "bg-info",
-                                          "Approved" => "bg-success",
-                                          "Rejected" => "bg-danger",
-                                          _ => "bg-secondary"
-                                      })">@claim.Status</span>
-                    </td>
-                    <td>
-                        @(claim.SupportingDocuments?.Count() ?? 0)
-                    </td>
-                    <td>
-                        <a asp-action="UploadDocuments" asp-route-claimId="@claim.ClaimId"
-                           class="btn btn-primary btn-sm">
-                            Upload Documents
-                        </a>
-                    </td>
-                </tr>
+                                <span class="badge @GetStatusBadgeClass(claim.Status)">@claim.Status</span>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(claim.DocumentPath))
+                                {
+                                    <span class="badge bg-success">Document attached</span>
                                 }
+                                else
+                                {
+                                    <span class="badge bg-secondary">No documents</span>
+                                }
+                            </td>
+                            <td>
+                                <a asp-action="UploadDocuments" asp-route-claimId="@claim.ClaimId"
+                                   class="btn btn-primary btn-sm">
+                                    Upload Documents
+                                </a>
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
@@ -79,3 +79,17 @@
         </div>
     </div>
 </div>
+
+@functions {
+    private string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            "Pending Verification" => "bg-warning",
+            "Verified" => "bg-info",
+            "Approved" => "bg-success",
+            "Rejected" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

@@ -31,17 +31,15 @@
         <a asp-action="Dashboard" class="btn btn-secondary mb-2 ms-2">Back to Dashboard</a>
     </form>
 
-    @if (Model.SupportingDocuments != null && Model.SupportingDocuments.Any())
+    <!-- FIXED: Use DocumentPath instead of SupportingDocuments -->
+    @if (!string.IsNullOrEmpty(Model.DocumentPath))
     {
         <h4 class="mt-4">Uploaded Files</h4>
-        <ul>
-            @foreach (var doc in Model.SupportingDocuments.OrderByDescending(d => d.DocumentId))
-            {
-                <li class="text-truncate" style="max-width: 300px;">
-                    <a href="@doc.FilePath" target="_blank" title="@doc.FileName">@doc.FileName</a>
-                </li>
-            }
-        </ul>
+        <div class="text-truncate" style="max-width: 300px;">
+            <a href="/uploads/@Model.DocumentPath" target="_blank" title="@Model.DocumentOriginalName">
+                @Model.DocumentOriginalName
+            </a>
+        </div>
     }
     else
     {

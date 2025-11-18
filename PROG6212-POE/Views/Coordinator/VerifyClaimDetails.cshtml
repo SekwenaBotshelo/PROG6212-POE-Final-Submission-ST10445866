@@ -12,7 +12,7 @@
             <h5 class="card-title">Claim Information</h5>
             <div class="row mt-3">
                 <div class="col-md-6 mb-2">
-                    <strong>Lecturer:</strong> @Model.LecturerName
+                    <strong>Lecturer:</strong> @Model.SafeLecturerName <!-- Fixed: Use SafeLecturerName -->
                 </div>
                 <div class="col-md-6 mb-2">
                     <strong>Month:</strong> @Model.Month
@@ -21,10 +21,10 @@
                     <strong>Total Hours:</strong> @Model.TotalHours
                 </div>
                 <div class="col-md-6 mb-2">
-                    <strong>Hourly Rate:</strong> R @Model.HourlyRate
+                    <strong>Hourly Rate:</strong> R @Model.StoredHourlyRate <!-- Fixed: Use StoredHourlyRate -->
                 </div>
                 <div class="col-md-6 mb-2">
-                    <strong>Total Amount:</strong> R @Model.TotalAmount
+                    <strong>Total Amount:</strong> R @Model.StoredTotalAmount <!-- Fixed: Use StoredTotalAmount -->
                 </div>
                 <div class="col-md-6 mb-2">
                     <strong>Status:</strong>
@@ -40,27 +40,33 @@
                     </span>
                 </div>
                 <div class="col-12 mt-2">
-                    <strong>Notes:</strong> @Model.Notes
+                    <strong>Notes:</strong> @(string.IsNullOrEmpty(Model.Notes) ? "No notes provided" : Model.Notes)
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Supporting Documents Card -->
-    @if (Model.SupportingDocuments != null && Model.SupportingDocuments.Any())
+    <!-- Supporting Documents Card - FIXED -->
+    @if (!string.IsNullOrEmpty(Model.DocumentPath))
     {
         <div class="card shadow-sm mb-4">
             <div class="card-header">Supporting Documents</div>
             <div class="card-body">
                 <ul class="list-group">
-                    @foreach (var doc in Model.SupportingDocuments)
-                    {
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <a href="@doc.FilePath" target="_blank">@doc.FileName</a>
-                            <span class="text-muted">@doc.UploadedOn.ToString("dd MMM yyyy")</span>
-                        </li>
-                    }
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="/uploads/@Model.DocumentPath" target="_blank">@Model.DocumentOriginalName</a>
+                        <span class="text-muted">@Model.SubmittedDate.ToString("dd MMM yyyy")</span>
+                    </li>
                 </ul>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">Supporting Documents</div>
+            <div class="card-body">
+                <p class="text-muted mb-0">No supporting documents attached to this claim.</p>
             </div>
         </div>
     }
