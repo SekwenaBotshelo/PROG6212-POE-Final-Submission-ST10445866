@@ -1,177 +1,124 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PROG6212_POE.Data;
 using PROG6212_POE.Models;
-using PROG6212_POE.Services;
-using System.Diagnostics;
+using System;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace PROG6212_POE.Controllers
 {
     public class ManagerController : Controller
     {
-        // Helper method to get current manager
-        private User GetCurrentManager()
-        {
-            var userId = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userId)) return null;
+        private readonly AppDbContext _context;
 
-            var users = DataService.GetUsers();
-            return users.FirstOrDefault(u => u.UserId.ToString() == userId && u.Role == "Manager");
+        public ManagerController(AppDbContext context)
+        {
+            _context = context;
         }
 
-        // GET: /Manager/Dashboard
+        // Dashboard: Display summary cards and all claims
         public IActionResult Dashboard()
         {
-            if (HttpContext.Session.GetString("UserRole") != "Manager")
-                return RedirectToAction("AccessDenied", "Account");
-
-            var manager = GetCurrentManager();
-            if (manager == null)
-                return RedirectToAction("Logout", "Account");
-
-            ViewBag.CurrentUser = manager;
-
-            // Get claims pending approval using DataService
-            var claims = DataService.GetClaims();
-            var verifiedClaims = claims.Where(c => c.Status == "Verified").ToList();
-            var approvedClaims = claims.Where(c => c.Status == "Approved" && c.ApprovedByManagerId == manager.UserId).ToList();
-
-            ViewBag.PendingApprovalCount = verifiedClaims.Count;
-            ViewBag.ApprovedCount = approvedClaims.Count;
-            ViewBag.TotalClaims = claims.Count;
-
-            return View(verifiedClaims);
+            var claims = _context.Claims.ToList();
+            PopulateClaimCounts(claims); // Set ViewBag counts for summary cards
+            return View(claims);
         }
 
-        // GET: /Manager/ApproveClaims
+        // Approve Claims: Display claims verified by coordinator for manager approval
         public IActionResult ApproveClaims()
         {
-            if (HttpContext.Session.GetString("UserRole") != "Manager")
-                return RedirectToAction("AccessDenied", "Account");
-
-            var manager = GetCurrentManager();
-            if (manager == null)
-                return RedirectToAction("Logout", "Account");
-
-            var claims = DataService.GetClaims();
-            var verifiedClaims = claims.Where(c => c.Status == "Verified").ToList();
-
-            ViewBag.CurrentUser = manager;
+            var verifiedClaims = _context.Claims
+                                         .Where(c => c.Status == ClaimStatus.Verified)
+                                         .Include(c => c.SupportingDocuments)
+                                         .ToList();
             return View(verifiedClaims);
         }
 
-        // GET: /Manager/ViewClaimDetails/{id}
+        // View Claim Details: Display full details of a specific claim including supporting documents
         public IActionResult ViewClaimDetails(int id)
         {
-            if (HttpContext.Session.GetString("UserRole") != "Manager")
-                return RedirectToAction("AccessDenied", "Account");
+            var claim = _context.Claims
+                                .Include(c => c.SupportingDocuments)
+                                .FirstOrDefault(c => c.ClaimId == id);
+            if (claim == null) return NotFound();
 
-            var claims = DataService.GetClaims();
-            var claim = claims.FirstOrDefault(c => c.ClaimId == id);
-
-            if (claim == null)
-            {
-                TempData["ErrorMessage"] = "Claim not found.";
-                return RedirectToAction("Dashboard");
-            }
-
-            ViewBag.ClaimId = id;
-            ViewBag.CurrentUser = GetCurrentManager();
-            return View(claim);
+            return View("ApproveClaimDetails", claim);
         }
 
-        // POST: /Manager/ApproveClaim
+        // POST: Approve a claim
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult ApproveClaim(int claimId)
+        public IActionResult Approve(int id)
         {
-            if (HttpContext.Session.GetString("UserRole") != "Manager")
-                return RedirectToAction("AccessDenied", "Account");
-
-            var manager = GetCurrentManager();
-            if (manager == null)
-                return RedirectToAction("Logout", "Account");
-
-            var claims = DataService.GetClaims();
-            var claim = claims.FirstOrDefault(c => c.ClaimId == claimId);
-
+            var claim = _context.Claims.FirstOrDefault(c => c.ClaimId == id);
             if (claim != null)
             {
-                claim.Status = "Approved";
-                claim.ApprovedByManagerId = manager.UserId;
-                claim.ApprovedDate = DateTime.Now;
+                // Automated approval rule: Auto-approve if TotalAmount <= 5000
+                if (claim.TotalAmount <= 5000)
+                    claim.Status = ClaimStatus.Approved;
+                else
+                    claim.Status = ClaimStatus.Verified; // Keep for manual review if needed
 
-                DataService.UpdateClaim(claim);
-                TempData["SuccessMessage"] = "Claim approved successfully!";
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Claim not found.";
+                _context.SaveChanges();
+
+                // Log action to AuditTrail
+                LogAudit($"Claim {(claim.Status == ClaimStatus.Approved ? "approved" : "kept for review")} for {claim.LecturerName} (Claim ID: {claim.ClaimId})", "Manager");
             }
 
-            return RedirectToAction("Dashboard");
+            return RedirectToAction("ApproveClaims");
         }
 
-        // POST: /Manager/RejectClaim
+        // POST: Reject a claim
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult RejectClaim(int claimId)
+        public IActionResult Reject(int id)
         {
-            if (HttpContext.Session.GetString("UserRole") != "Manager")
-                return RedirectToAction("AccessDenied", "Account");
-
-            var manager = GetCurrentManager();
-            if (manager == null)
-                return RedirectToAction("Logout", "Account");
-
-            var claims = DataService.GetClaims();
-            var claim = claims.FirstOrDefault(c => c.ClaimId == claimId);
-
+            var claim = _context.Claims.FirstOrDefault(c => c.ClaimId == id);
             if (claim != null)
             {
-                claim.Status = "Rejected";
-                claim.ApprovedByManagerId = manager.UserId;
-                claim.ApprovedDate = DateTime.Now;
+                claim.Status = ClaimStatus.Rejected;
+                _context.SaveChanges();
 
-                DataService.UpdateClaim(claim);
-                TempData["SuccessMessage"] = "Claim rejected successfully!";
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Claim not found.";
+                // Log action to AuditTrail
+                LogAudit($"Claim rejected for {claim.LecturerName} (Claim ID: {claim.ClaimId})", "Manager");
             }
 
-            return RedirectToAction("Dashboard");
+            return RedirectToAction("ApproveClaims");
         }
 
-        // GET: /Manager/Reports
+        // Reports: Display all claims with supporting documents for reporting purposes
         public IActionResult Reports()
         {
-            if (HttpContext.Session.GetString("UserRole") != "Manager")
-                return RedirectToAction("AccessDenied", "Account");
+            var allClaims = _context.Claims
+                                    .Include(c => c.SupportingDocuments)
+                                    .ToList();
 
-            var manager = GetCurrentManager();
-            if (manager == null)
-                return RedirectToAction("Logout", "Account");
+            // Log report generation
+            LogAudit("Manager generated claims report", "Manager");
 
-            var claims = DataService.GetClaims();
-            var approvedClaims = claims.Where(c => c.Status == "Approved").ToList();
+            return View(allClaims);
+        }
 
-            // LINQ queries for reporting
-            var monthlySummary = approvedClaims
-                .GroupBy(c => c.Month)
-                .Select(g => new {
-                    Month = g.Key,
-                    TotalAmount = g.Sum(c => c.TotalAmount),
-                    ClaimCount = g.Count(),
-                    AverageAmount = g.Average(c => c.TotalAmount)
-                })
-                .ToList();
+        // -------------------- PRIVATE HELPERS --------------------
 
-            ViewBag.MonthlySummary = monthlySummary;
-            ViewBag.TotalApprovedAmount = approvedClaims.Sum(c => c.TotalAmount);
-            ViewBag.TotalApprovedClaims = approvedClaims.Count;
-            ViewBag.CurrentUser = manager;
+        // Helper method to populate ViewBag with claim counts for dashboard summary cards
+        private void PopulateClaimCounts(System.Collections.Generic.List<Claim> claims)
+        {
+            ViewBag.PendingCount = claims.Count(c => c.Status == ClaimStatus.Pending);
+            ViewBag.VerifiedCount = claims.Count(c => c.Status == ClaimStatus.Verified);
+            ViewBag.ApprovedCount = claims.Count(c => c.Status == ClaimStatus.Approved);
+            ViewBag.RejectedCount = claims.Count(c => c.Status == ClaimStatus.Rejected);
+            ViewBag.TotalCount = claims.Count;
+        }
 
-            return View(approvedClaims);
+        // Helper method to log audit actions
+        private void LogAudit(string action, string userName)
+        {
+            _context.AuditTrails.Add(new AuditTrail
+            {
+                Action = action,
+                Timestamp = DateTime.Now,
+                UserName = userName
+            });
+            _context.SaveChanges();
         }
     }
 }

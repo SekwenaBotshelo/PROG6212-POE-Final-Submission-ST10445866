@@ -363,3 +363,16 @@ C:\Users\lab_services_student\Desktop\PROG6212\Assessment\PROG6212-POE\PROG6212-
 C:\Users\lab_services_student\Desktop\PROG6212\Assessment\PROG6212-POE\PROG6212-POE\bin\Debug\net9.0\runtimes\win\lib\net9.0\System.Security.Cryptography.Pkcs.dll
 C:\Users\lab_services_student\Desktop\PROG6212\Assessment\PROG6212-POE\PROG6212-POE\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 C:\Users\lab_services_student\Desktop\PROG6212\Assessment\PROG6212-POE\PROG6212-POE\obj\Debug\net9.0\compressed\i97jq5ure8-1b3bhyviif.gz
+C:\Users\lab_services_student\Desktop\PROG6212\Assessment\Final Submission\PROG6212-POE-Final-Submission-ST10445866\PROG6212-POE\obj\Debug\net9.0\PROG6212-POE.csproj.AssemblyReference.cache
+C:\Users\lab_services_student\Desktop\PROG6212\Assessment\Final Submission\PROG6212-POE-Final-Submission-ST10445866\PROG6212-POE\obj\Debug\net9.0\rpswa.dswa.cache.json
+C:\Users\lab_services_student\Desktop\PROG6212\Assessment\Final Submission\PROG6212-POE-Final-Submission-ST10445866\PROG6212-POE\obj\Debug\net9.0\PROG6212-POE.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\lab_services_student\Desktop\PROG6212\Assessment\Final Submission\PROG6212-POE-Final-Submission-ST10445866\PROG6212-POE\obj\Debug\net9.0\PROG6212-POE.AssemblyInfoInputs.cache
+C:\Users\lab_services_student\Desktop\PROG6212\Assessment\Final Submission\PROG6212-POE-Final-Submission-ST10445866\PROG6212-POE\obj\Debug\net9.0\PROG6212-POE.AssemblyInfo.cs
+C:\Users\lab_services_student\Desktop\PROG6212\Assessment\Final Submission\PROG6212-POE-Final-Submission-ST10445866\PROG6212-POE\obj\Debug\net9.0\PROG6212-POE.csproj.CoreCompileInputs.cache
+C:\Users\lab_services_student\Desktop\PROG6212\Assessment\Final Submission\PROG6212-POE-Final-Submission-ST10445866\PROG6212-POE\obj\Debug\net9.0\PROG6212-POE.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\lab_services_student\Desktop\PROG6212\Assessment\Final Submission\PROG6212-POE-Final-Submission-ST10445866\PROG6212-POE\obj\Debug\net9.0\PROG6212-POE.RazorAssemblyInfo.cache
+C:\Users\lab_services_student\Desktop\PROG6212\Assessment\Final Submission\PROG6212-POE-Final-Submission-ST10445866\PROG6212-POE\obj\Debug\net9.0\PROG6212-POE.RazorAssemblyInfo.cs
+C:\Users\lab_services_student\Desktop\PROG6212\Assessment\Final Submission\PROG6212-POE-Final-Submission-ST10445866\PROG6212-POE\obj\Debug\net9.0\PROG6212-POE.sourcelink.json
+C:\Users\lab_services_student\Desktop\PROG6212\Assessment\Final Submission\PROG6212-POE-Final-Submission-ST10445866\PROG6212-POE\obj\Debug\net9.0\PROG6212-POE.dll
+C:\Users\lab_services_student\Desktop\PROG6212\Assessment\Final Submission\PROG6212-POE-Final-Submission-ST10445866\PROG6212-POE\obj\Debug\net9.0\refint\PROG6212-POE.dll
+C:\Users\lab_services_student\Desktop\PROG6212\Assessment\Final Submission\PROG6212-POE-Final-Submission-ST10445866\PROG6212-POE\obj\Debug\net9.0\PROG6212-POE.pdb

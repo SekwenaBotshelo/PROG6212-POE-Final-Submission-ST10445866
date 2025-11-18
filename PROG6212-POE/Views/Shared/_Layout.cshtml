@@ -6,353 +6,13 @@
     <title>@ViewData["Title"] - Contract Monthly Claim System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-    <!-- ADD SWEETALERT2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        /* Light mode (default) */
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --bg-card: #ffffff;
-            --text-primary: #212529;
-            --text-secondary: #6c757d;
-            --border-color: #dee2e6;
-            --table-striped: rgba(0, 0, 0, 0.02);
-            --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            --placeholder-color: #6c757d;
-        }
-
-        /* Dark mode variables */
-        [data-theme="dark"] {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --bg-card: #2d2d2d;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --border-color: #444;
-            --table-striped: rgba(255, 255, 255, 0.02);
-            --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.5);
-            --placeholder-color: #8e8e8e;
-        }
-
-        /* Base styles */
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-        }
-
-        /* Navigation */
-        [data-theme="dark"] .navbar {
-            background-color: var(--bg-secondary) !important;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        [data-theme="dark"] .nav-link {
-            color: var(--text-primary) !important;
-        }
-
-            [data-theme="dark"] .nav-link.text-dark {
-                color: var(--text-primary) !important;
-            }
-
-        [data-theme="dark"] .navbar-brand {
-            color: var(--text-primary) !important;
-        }
-
-        /* Cards */
-        [data-theme="dark"] .card {
-            background-color: var(--bg-card);
-            border-color: var(--border-color);
-            color: var(--text-primary);
-        }
-
-        [data-theme="dark"] .card-header {
-            background-color: var(--bg-secondary) !important;
-            border-bottom-color: var(--border-color);
-            color: var(--text-primary);
-        }
-
-        [data-theme="dark"] .card-body {
-            background-color: var(--bg-card);
-            color: var(--text-primary);
-        }
-
-        /* Tables */
-        [data-theme="dark"] .table {
-            color: var(--text-primary);
-            background-color: var(--bg-card);
-        }
-
-            [data-theme="dark"] .table th {
-                background-color: var(--bg-secondary);
-                border-color: var(--border-color);
-                color: var(--text-primary);
-            }
-
-            [data-theme="dark"] .table td {
-                border-color: var(--border-color);
-                background-color: var(--bg-card);
-                color: var(--text-primary);
-            }
-
-        [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
-            background-color: var(--table-striped);
-        }
-
-        [data-theme="dark"] .table-hover tbody tr:hover {
-            background-color: rgba(255, 255, 255, 0.075);
-            color: var(--text-primary);
-        }
-
-        /* Forms */
-        [data-theme="dark"] .form-control {
-            background-color: var(--bg-secondary);
-            border-color: var(--border-color);
-            color: var(--text-primary);
-        }
-
-            [data-theme="dark"] .form-control:focus {
-                background-color: var(--bg-secondary);
-                border-color: #007bff;
-                color: var(--text-primary);
-                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-            }
-
-        [data-theme="dark"] .form-label {
-            color: var(--text-primary);
-        }
-
-        [data-theme="dark"] .form-text {
-            color: var(--text-secondary) !important;
-        }
-
-        /* Placeholder text - FIXED */
-        [data-theme="dark"] .form-control::placeholder {
-            color: var(--placeholder-color) !important;
-            opacity: 1;
-        }
-
-        [data-theme="dark"] .form-control::-webkit-input-placeholder {
-            color: var(--placeholder-color) !important;
-        }
-
-        [data-theme="dark"] .form-control::-moz-placeholder {
-            color: var(--placeholder-color) !important;
-        }
-
-        [data-theme="dark"] .form-control:-ms-input-placeholder {
-            color: var(--placeholder-color) !important;
-        }
-
-        [data-theme="dark"] .form-control:-moz-placeholder {
-            color: var(--placeholder-color) !important;
-        }
-
-        /* Textareas - Additional Notes fix */
-        [data-theme="dark"] textarea.form-control {
-            background-color: var(--bg-secondary);
-            border-color: var(--border-color);
-            color: var(--text-primary);
-        }
-
-            [data-theme="dark"] textarea.form-control::placeholder {
-                color: var(--placeholder-color) !important;
-            }
-
-        /* Calendar/Date Picker - ICON COLOR ONLY - FIXED */
-        [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
-        [data-theme="dark"] input[type="month"]::-webkit-calendar-picker-indicator,
-        [data-theme="dark"] input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-            filter: invert(0.8);
-            cursor: pointer;
-        }
-
-        /* Alerts */
-        [data-theme="dark"] .alert {
-            background-color: var(--bg-secondary);
-            border-color: var(--border-color);
-            color: var(--text-primary);
-        }
-
-        [data-theme="dark"] .alert-info {
-            background-color: rgba(13, 202, 240, 0.2);
-            border-color: #0dcaf0;
-            color: #cff4fc;
-        }
-
-        [data-theme="dark"] .alert-success {
-            background-color: rgba(25, 135, 84, 0.2);
-            border-color: #198754;
-            color: #d1e7dd;
-        }
-
-        [data-theme="dark"] .alert-warning {
-            background-color: rgba(255, 193, 7, 0.2);
-            border-color: #ffc107;
-            color: #fff3cd;
-        }
-
-        [data-theme="dark"] .alert-danger {
-            background-color: rgba(220, 53, 69, 0.2);
-            border-color: #dc3545;
-            color: #f8d7da;
-        }
-
-        /* Buttons */
-        [data-theme="dark"] .btn-outline-primary {
-            color: #007bff;
-            border-color: #007bff;
-        }
-
-            [data-theme="dark"] .btn-outline-primary:hover {
-                background-color: #007bff;
-                border-color: #007bff;
-                color: white;
-            }
-
-        [data-theme="dark"] .btn-outline-secondary {
-            color: var(--text-secondary);
-            border-color: var(--border-color);
-        }
-
-            [data-theme="dark"] .btn-outline-secondary:hover {
-                background-color: var(--border-color);
-                border-color: var(--border-color);
-                color: var(--text-primary);
-            }
-
-        /* Text colors */
-        [data-theme="dark"] .text-muted {
-            color: var(--text-secondary) !important;
-        }
-
-        [data-theme="dark"] .text-dark {
-            color: var(--text-primary) !important;
-        }
-
-        [data-theme="dark"] .text-secondary {
-            color: var(--text-secondary) !important;
-        }
-
-        /* Paragraphs and general text - FIX for Privacy/About pages */
-        [data-theme="dark"] p {
-            color: var(--text-primary) !important;
-        }
-
-        [data-theme="dark"] li {
-            color: var(--text-primary) !important;
-        }
-
-        [data-theme="dark"] span {
-            color: var(--text-primary) !important;
-        }
-
-        [data-theme="dark"] small {
-            color: var(--text-secondary) !important;
-        }
-
-        [data-theme="dark"] .lead {
-            color: var(--text-secondary) !important;
-        }
-
-        /* Footer */
-        [data-theme="dark"] footer {
-            background-color: var(--bg-secondary);
-            border-top-color: var(--border-color);
-            color: var(--text-secondary);
-        }
-
-            [data-theme="dark"] footer a {
-                color: var(--text-secondary);
-            }
-
-                [data-theme="dark"] footer a:hover {
-                    color: var(--text-primary);
-                }
-
-        /* Background utilities */
-        [data-theme="dark"] .bg-light {
-            background-color: var(--bg-secondary) !important;
-            color: var(--text-primary);
-        }
-
-        [data-theme="dark"] .bg-white {
-            background-color: var(--bg-secondary) !important;
-            color: var(--text-primary);
-        }
-
-        /* Search container */
-        [data-theme="dark"] .search-container .form-control {
-            background-color: var(--bg-secondary);
-            border-color: var(--border-color);
-            color: var(--text-primary);
-        }
-
-        [data-theme="dark"] .search-container .btn-outline-primary {
-            color: #007bff;
-            border-color: #007bff;
-        }
-
-        /* Specific fixes for Privacy/About page content */
-        [data-theme="dark"] .card-text,
-        [data-theme="dark"] .list-group-item,
-        [data-theme="dark"] .display-4,
-        [data-theme="dark"] .display-5,
-        [data-theme="dark"] .display-6,
-        [data-theme="dark"] h1,
-        [data-theme="dark"] h2,
-        [data-theme="dark"] h3,
-        [data-theme="dark"] h4,
-        [data-theme="dark"] h5,
-        [data-theme="dark"] h6 {
-            color: var(--text-primary) !important;
-        }
-
-        [data-theme="dark"] .text-body {
-            color: var(--text-primary) !important;
-        }
-
-        /* Print styles for dark mode */
-        @@media print {
-            [data-theme="dark"] {
-                --bg-primary: #ffffff;
-                --text-primary: #000000;
-            }
-
-            body {
-                background-color: white !important;
-                color: black !important;
-            }
-
-            .card {
-                background-color: white !important;
-                border-color: #dee2e6 !important;
-                color: black !important;
-            }
-
-            .table {
-                color: black !important;
-            }
-        }
-
-        .search-container {
-            min-width: 250px;
-        }
-
-        /* Smooth transitions */
-        * {
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-        }
-    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-journal-text"></i> Contract Monthly Claim System
+                    Contract Monthly Claim System
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -360,102 +20,19 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">
-                                <i class="bi bi-house"></i> Home
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="About">
-                                <i class="bi bi-info-circle"></i> About
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Contact">
-                                <i class="bi bi-envelope"></i> Contact
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Privacy">
-                                <i class="bi bi-shield-check"></i> Privacy
-                            </a>
-                        </li>
-
-                        <!-- Show these only when user is logged in -->
-                        @if (Context.Session.GetString("UserId") != null)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="@Context.Session.GetString("UserRole")"
-                                   asp-action="Dashboard">
-                                    <i class="bi bi-speedometer2"></i> Dashboard
-                                </a>
-                            </li>
-
-                            <!-- Show user info -->
-                            <li class="nav-item">
-                                <span class="nav-link text-dark">
-                                    <i class="bi bi-person-circle"></i>
-                                    @Context.Session.GetString("UserName")
-                                    <small class="text-muted">(@Context.Session.GetString("UserRole"))</small>
-                                </span>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link text-danger" asp-controller="Account" asp-action="Logout">
-                                    <i class="bi bi-box-arrow-right"></i> Logout
-                                </a>
-                            </li>
-                        }
-                        else
-                        {
-                            <!-- Show these links when not logged in -->
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Login">
-                                    <i class="bi bi-box-arrow-in-right"></i> Login
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Lecturer" asp-action="Dashboard">
-                                    <i class="bi bi-person"></i> Lecturer
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Coordinator" asp-action="Dashboard">
-                                    <i class="bi bi-clipboard-check"></i> Coordinator
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Manager" asp-action="Dashboard">
-                                    <i class="bi bi-graph-up"></i> Manager
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="HR" asp-action="Dashboard">
-                                    <i class="bi bi-people"></i> HR
-                                </a>
-                            </li>
-                        }
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Lecturer" asp-action="Dashboard">Lecturer</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Coordinator" asp-action="Dashboard">Coordinator</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Manager" asp-action="Dashboard">Manager</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Privacy">Privacy</a></li>
                     </ul>
 
-                    <!-- Search Form - ALWAYS VISIBLE -->
-                    <div class="search-container">
-                        <form id="dashboardSearchForm" class="d-flex me-2" method="get" asp-controller="Home" asp-action="DashboardSearch">
-                            <input id="dashboardSearch" class="form-control me-1" type="search"
-                                   placeholder="Try: Lecturer, Coordinator..."
-                                   aria-label="Search" name="dashboard" />
-                            <button id="searchBtn" class="btn btn-outline-primary" type="submit">
-                                <i class="bi bi-search"></i> Go
-                            </button>
-                        </form>
-                    </div>
+                    <form id="dashboardSearchForm" class="d-flex me-2" method="get">
+                        <input id="dashboardSearch" class="form-control me-1" type="search" placeholder="Search Dashboard..." aria-label="Search" name="dashboard" />
+                        <button id="searchBtn" class="btn btn-outline-primary" type="submit">Go</button>
+                    </form>
 
-                    <!-- Dark/Light Mode Toggle -->
-                    <button id="themeToggle" class="btn btn-outline-secondary ms-2">
-                        <i class="bi bi-moon"></i>
-                    </button>
+                    <button id="themeToggle" class="btn btn-outline-secondary ms-2">🌙</button>
                 </div>
             </div>
         </nav>
@@ -478,69 +55,47 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    <!-- SWEETALERT2 MESSAGE HANDLING -->
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: '@TempData["SuccessMessage"]',
-                timer: 3000,
-                showConfirmButton: false
-            });
-        </script>
-    }
-
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: '@TempData["ErrorMessage"]',
-                timer: 4000
-            });
-        </script>
-    }
-
-    <!-- IMPROVED THEME TOGGLE SCRIPT -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const themeToggle = document.getElementById('themeToggle');
-            const themeIcon = themeToggle.querySelector('i');
-            const htmlElement = document.documentElement;
+        const themeToggle = document.getElementById("themeToggle");
+        const body = document.body;
 
-            // Check for saved theme preference or default to light mode
-            const currentTheme = localStorage.getItem('theme') || 'light';
+        // Load saved theme on page load
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
+            body.classList.add("dark-mode");
+            themeToggle.textContent = "☀️";
+        } else {
+            themeToggle.textContent = "🌙";
+        }
 
-            // Apply the saved theme
-            if (currentTheme === 'dark') {
-                htmlElement.setAttribute('data-theme', 'dark');
-                themeIcon.classList.remove('bi-moon');
-                themeIcon.classList.add('bi-sun');
+        // Toggle dark/light mode
+        themeToggle.addEventListener("click", () => {
+            body.classList.toggle("dark-mode");
+            if (body.classList.contains("dark-mode")) {
+                localStorage.setItem("theme", "dark");
+                themeToggle.textContent = "☀️";
             } else {
-                htmlElement.removeAttribute('data-theme');
-                themeIcon.classList.remove('bi-sun');
-                themeIcon.classList.add('bi-moon');
+                localStorage.setItem("theme", "light");
+                themeToggle.textContent = "🌙";
             }
+        });
 
-            // Theme toggle event
-            themeToggle.addEventListener('click', function() {
-                if (htmlElement.getAttribute('data-theme') === 'dark') {
-                    // Switch to light mode
-                    htmlElement.removeAttribute('data-theme');
-                    localStorage.setItem('theme', 'light');
-                    themeIcon.classList.remove('bi-sun');
-                    themeIcon.classList.add('bi-moon');
-                } else {
-                    // Switch to dark mode
-                    htmlElement.setAttribute('data-theme', 'dark');
-                    localStorage.setItem('theme', 'dark');
-                    themeIcon.classList.remove('bi-moon');
-                    themeIcon.classList.add('bi-sun');
-                }
-            });
+        // Dashboard search handling
+        const dashboardSearchForm = document.getElementById("dashboardSearchForm");
+        dashboardSearchForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            const query = document.getElementById("dashboardSearch").value.trim().toLowerCase();
+            if (!query) return; // do nothing if empty
+
+            if (query.includes("lecturer")) {
+                window.location.href = '/Lecturer/Dashboard';
+            } else if (query.includes("coordinator") || query.includes("programme coordinator")) {
+                window.location.href = '/Coordinator/Dashboard';
+            } else if (query.includes("manager") || query.includes("academic manager")) {
+                window.location.href = '/Manager/Dashboard';
+            } else {
+                window.location.href = '/Home/Index'; // fallback
+            }
         });
     </script>
 

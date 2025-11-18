@@ -13,7 +13,7 @@ namespace PROG6212_POE.Models
         public int LecturerId { get; set; }
 
         [ForeignKey("LecturerId")]
-        public virtual User? Lecturer { get; set; } // Make nullable
+        public virtual User? Lecturer { get; set; }
 
         [Required(ErrorMessage = "Please enter total hours worked.")]
         [Range(1, 180, ErrorMessage = "Hours must be between 1 and 180.")]
@@ -29,7 +29,6 @@ namespace PROG6212_POE.Models
         [DataType(DataType.Currency)]
         public decimal StoredTotalAmount { get; set; }
 
-        // NOTES IS OPTIONAL
         [Display(Name = "Additional Notes")]
         [StringLength(500, ErrorMessage = "Notes cannot exceed 500 characters")]
         public string? Notes { get; set; }
@@ -91,16 +90,8 @@ namespace PROG6212_POE.Models
 
         // COMPUTED PROPERTIES WITH NULL CHECKING
         [NotMapped]
-        public string LecturerName => Lecturer?.FullName ?? "Unknown Lecturer";
+        public string SafeLecturerName => Lecturer?.FullName ?? "Unknown Lecturer";
 
-        [NotMapped]
-        public decimal HourlyRate => StoredHourlyRate;
-
-        // NEW: Safe property for Lecturer FullName
-        [NotMapped]
-        public string SafeLecturerName => Lecturer?.FullName ?? "Lecturer Not Found";
-
-        // NEW: Safe property for Lecturer Email
         [NotMapped]
         public string SafeLecturerEmail => Lecturer?.Email ?? "Email Not Available";
     }
