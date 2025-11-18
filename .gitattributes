@@ -1,0 +1,16 @@
+* text=auto
+*.cs text diff=csharp
+*.cshtml text diff=html
+*.css text diff=css
+*.js text diff=javascript
+*.json text diff=json
+*.xml text diff=xml
+*.md text
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.sln text eol=crlf
+*.csproj text eol=crlf
