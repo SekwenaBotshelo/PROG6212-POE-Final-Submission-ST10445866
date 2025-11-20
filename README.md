@@ -9,7 +9,7 @@ A comprehensive web-based claim management system built with ASP.NET Core MVC th
 - **Student Name:** Botshelo Koketso Sekwena
 - **Student Number:** ST10445866
 - **Module:** PROG6212 - Programming 2B
-- **GitHub Rpository:** https://github.com/SekwenaBotshelo/PROG6212-POE-Final-Submission-ST10445866.git 
+- **GitHub Rpository:** https://github.com/SekwenaBotshelo/PROG6212-POE-Final-Submission-ST10445866.git
 
 ## Technology Stack
 
@@ -148,3 +148,11 @@ dotnet test
 This Contract Monthly Claim System represents a production-ready enterprise solution that successfully implements all Part 3 requirements while addressing feedback from Part 2. The system demonstrates professional software engineering practices, comprehensive testing, and user-centered design.
 
 ## Referances
+- Steve Smith. (2024, June 17). Overview of ASP.NET Core MVC. Retrieved from Microsoft Ignite: https://learn.microsoft.com/en-us/aspnet/core/mvc/overview?view=aspnetcore-9.0
+- xUnit.net. (n.d.). About xUnit.net. Retrieved from xUnit.net: https://xunit.net/?tabs=cs
+- Microsoft Ignite. (2025, January 29). ASP.NET Core security topics. Retrieved from Microsoft Ignite: https://learn.microsoft.com/en-us/aspnet/core/security/?view=aspnetcore-9.0
+- Andrew Troelsen, Phil Japikse. (2022). Pro C# 10 with .NET 6. New York: Apress.
+- Gregg Lindemulder, Matt Kosinski. (n.d.). What is role-based access control (RBAC)? . Retrieved from IBM: https://www.ibm.com/think/topics/rbac
+- Microsoft Learn. (2025). Implement role-based access control. Retrieved from Microsoft Learn: https://learn.microsoft.com/en-us/entra/identity-platform/howto-implement-rbac-for-apps
+- Microsoft Learn. (2025). Logging in C# and .NET. Retrieved from Microsoft Learn: https://learn.microsoft.com/en-us/dotnet/core/extensions/logging?tabs=command-line
+
