@@ -152,7 +152,8 @@ namespace PROG6212_POE.Controllers
             var approvedClaims = claims.Where(c => c.Status == "Approved").ToList();
             var monthlyReport = approvedClaims
                 .GroupBy(c => c.Month)
-                .Select(g => new {
+                .Select(g => new
+                {
                     Month = g.Key,
                     TotalAmount = g.Sum(c => c.TotalAmount),
                     ClaimCount = g.Count()
@@ -175,7 +176,5 @@ namespace PROG6212_POE.Controllers
             var claims = DataService.GetClaims();
             return View(claims);
         }
-
-        // Note: Removed the static helper methods since we're using DataService directly
     }
 }
