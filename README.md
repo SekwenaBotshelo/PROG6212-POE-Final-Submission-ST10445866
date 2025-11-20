@@ -96,7 +96,6 @@ A comprehensive web-based claim management system built with ASP.NET Core MVC th
 var totalAmount = model.TotalHours * (double)lecturer.HourlyRate;
 
 ### Business Rule Enforcement
-csharp
 [Range(1, 180, ErrorMessage = "Maximum 180 hours per month")]
 public double TotalHours { get; set; }
 
@@ -111,8 +110,6 @@ if (HttpContext.Session.GetString("UserRole") != "Lecturer")
 
 
 ## **Installation & Setup**
-markdown
-## Installation & Setup
 
 ### Prerequisites
 - .NET 9.0 SDK
