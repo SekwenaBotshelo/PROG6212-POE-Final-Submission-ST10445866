@@ -256,5 +256,99 @@ namespace PROG6212_POE.Controllers
                 return RedirectToAction("UploadDocuments", new { claimId });
             }
         }
+        // GET: /Lecturer/UploadDocumentForClaim
+        public IActionResult UploadDocumentForClaim(int claimId)
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Lecturer")
+                return RedirectToAction("AccessDenied", "Account");
+
+            var lecturer = GetCurrentLecturer();
+            if (lecturer == null)
+                return RedirectToAction("Logout", "Account");
+
+            // Verify the claim belongs to the current lecturer
+            var claim = DataService.GetClaims().FirstOrDefault(c => c.ClaimId == claimId && c.LecturerId == lecturer.UserId);
+
+            if (claim == null)
+            {
+                TempData["ErrorMessage"] = "Claim not found or you don't have permission to access it.";
+                return RedirectToAction("TrackClaims");
+            }
+
+            return View(claim); // Pass the claim model to the view
+        }
+
+        // POST: /Lecturer/UploadDocumentForClaim
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadDocumentForClaim(int claimId, IFormFile supportingDocument)
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Lecturer")
+                return RedirectToAction("AccessDenied", "Account");
+
+            var lecturer = GetCurrentLecturer();
+            if (lecturer == null)
+                return RedirectToAction("Logout", "Account");
+
+            try
+            {
+                // Verify claim ownership
+                var claim = DataService.GetClaims().FirstOrDefault(c => c.ClaimId == claimId && c.LecturerId == lecturer.UserId);
+                if (claim == null)
+                {
+                    TempData["ErrorMessage"] = "Claim not found or you don't have permission to access it.";
+                    return RedirectToAction("TrackClaims");
+                }
+
+                if (supportingDocument == null || supportingDocument.Length == 0)
+                {
+                    TempData["ErrorMessage"] = "Please select a file to upload.";
+                    return RedirectToAction("UploadDocumentForClaim", new { claimId });
+                }
+
+                // File validation
+                var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png" };
+                var fileExtension = Path.GetExtension(supportingDocument.FileName).ToLower();
+
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    TempData["ErrorMessage"] = "Invalid file type. Allowed: PDF, Word, JPG, PNG.";
+                    return RedirectToAction("UploadDocumentForClaim", new { claimId });
+                }
+
+                if (supportingDocument.Length > 10 * 1024 * 1024) // 10MB limit
+                {
+                    TempData["ErrorMessage"] = "File size too large. Maximum 10MB allowed.";
+                    return RedirectToAction("UploadDocumentForClaim", new { claimId });
+                }
+
+                // Save file to wwwroot/uploads folder
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var fileName = $"claim_{claimId}_{DateTime.Now:yyyyMMddHHmmss}_{Path.GetFileName(supportingDocument.FileName)}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await supportingDocument.CopyToAsync(stream);
+                }
+
+                // Update claim with document information
+                claim.DocumentPath = fileName;
+                claim.DocumentOriginalName = supportingDocument.FileName;
+
+                TempData["SuccessMessage"] = $"Document uploaded successfully for Claim #{claimId}!";
+                return RedirectToAction("TrackClaims");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error uploading document: {ex.Message}";
+                return RedirectToAction("UploadDocumentForClaim", new { claimId });
+            }
+        }
     }
 }

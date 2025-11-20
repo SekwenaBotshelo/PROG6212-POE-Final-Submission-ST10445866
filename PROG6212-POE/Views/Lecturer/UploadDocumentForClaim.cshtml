@@ -23,13 +23,13 @@
                     </div>
 
                     <!-- Upload Form -->
-                    <form asp-action="UploadDocumentForClaim" method="post" enctype="multipart/form-data" id="uploadForm">
+                    <form asp-action="UploadDocuments" method="post" enctype="multipart/form-data" id="uploadForm">
                         <input type="hidden" name="claimId" value="@Model.ClaimId" />
 
                         <div class="mb-3">
-                            <label for="supportingDocument" class="form-label fw-bold">Supporting Document *</label>
-                            <input type="file" class="form-control" id="supportingDocument"
-                                   name="supportingDocument" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required />
+                            <label for="supportingFile" class="form-label fw-bold">Supporting Document *</label>
+                            <input type="file" class="form-control" id="supportingFile"
+                                   name="supportingFile" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required />
                             <div class="form-text">
                                 <i class="bi bi-info-circle"></i> Allowed file types: PDF, Word documents (.doc, .docx), Images (.jpg, .jpeg, .png). Maximum file size: 10MB.
                             </div>
@@ -78,7 +78,7 @@
 @section Scripts {
     <script>
         function confirmUpload() {
-            const fileInput = document.querySelector('[name="supportingDocument"]');
+            const fileInput = document.querySelector('[name="supportingFile"]');
 
             if (!fileInput.files.length) {
                 Swal.fire('Error', 'Please select a file to upload.', 'error');
