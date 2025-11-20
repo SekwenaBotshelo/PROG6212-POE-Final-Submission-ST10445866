@@ -9,7 +9,7 @@ A comprehensive web-based claim management system built with ASP.NET Core MVC th
 - **Student Name:** Botshelo Koketso Sekwena
 - **Student Number:** ST10445866
 - **Module:** PROG6212 - Programming 2B
-- **GitHub Rpository:** https://github.com/SekwenaBotshelo/PROG6212-POE-Final-Submission-ST10445866.git 
+- **GitHub Rpository:** https://github.com/SekwenaBotshelo/PROG6212-POE-Final-Submission-ST10445866.git
 
 ## Technology Stack
 
